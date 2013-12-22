@@ -606,6 +606,8 @@ void Commands::executeGCode(GCode *com)
             Printer::coordinateOffset[0] = Printer::coordinateOffset[1] = Printer::coordinateOffset[2] = 0;
             Printer::setAutolevelActive(false); // iterate
             float h1,h2,h3,hc,oldFeedrate = Printer::feedrate;
+            Printer::moveTo(0,0,30,IGNORE_COORDINATE,EEPROM::zProbeXYSpeed());
+            
             Printer::moveTo(EEPROM::zProbeX1(),EEPROM::zProbeY1(),IGNORE_COORDINATE,IGNORE_COORDINATE,EEPROM::zProbeXYSpeed());
             h1 = Printer::runZProbe(true,false);
             if(h1<0) break;
