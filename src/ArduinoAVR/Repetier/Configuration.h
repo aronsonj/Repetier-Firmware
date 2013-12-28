@@ -128,7 +128,7 @@ If a motor turns in the wrong direction change INVERT_X_DIR or INVERT_Y_DIR.
 #define STEPS_PER_ROTATION 200
 
 /** \brief Micro stepping rate of X, Y and Y tower stepper drivers */
-#define MICRO_STEPS 16
+#define MICRO_STEPS 32
 
 // Calculations
 #define AXIS_STEPS_PER_MM ((float)(MICRO_STEPS * STEPS_PER_ROTATION) / PULLEY_CIRCUMFERENCE)
@@ -537,7 +537,7 @@ Value is used for all generic tables created. */
 /** \brief Pin to enable heater for bed. */
 #define HEATED_BED_HEATER_PIN HEATER_0_PIN
 // How often the temperature of the heated bed is set (msec)
-#define HEATED_BED_SET_INTERVAL 2000
+#define HEATED_BED_SET_INTERVAL 5000
 
 /**
 Heat manager for heated bed:
@@ -1104,7 +1104,7 @@ is always running and is not hung up for some unknown reason. */
 #define Z_PROBE_SPEED 5
 #define Z_PROBE_XY_SPEED 100
 /** The height is the difference between activated probe position and nozzle height. */
-#define Z_PROBE_HEIGHT 7.2
+#define Z_PROBE_HEIGHT 6.6
 /** These scripts are run before resp. after the z-probe is done. Add here code to activate/deactivate probe if needed. */
 //#define Z_PROBE_START_SCRIPT "G1 Z50\n"
 #define Z_PROBE_START_SCRIPT ""
@@ -1120,7 +1120,7 @@ is always running and is not hung up for some unknown reason. */
 */
 #define FEATURE_AUTOLEVEL true
 
-#define AR  70
+#define AR  75
 #define SQRT3 1.7320508
 
 #define Z_PROBE_X1 (-AR/2*SQRT3)
@@ -1155,7 +1155,7 @@ with long filenames!
 #define FEATURE_MEMORY_POSITION true
 
 /** If a checksum is sent, all future comamnds must also contain a checksum. Increases reliability especially for binary protocol. */
-#define FEATURE_CHECKSUM_FORCED true
+#define FEATURE_CHECKSUM_FORCED false
 
 /** Should support for fan control be compiled in. If you enable this make sure
 the FAN pin is not the same as for your second extruder. RAMPS e.g. has FAN_PIN in 9 which
@@ -1258,8 +1258,8 @@ Values must be in range 1..255
 
 // Values used for preheat
 #define UI_SET_PRESET_HEATED_BED_TEMP_PLA 60
-#define UI_SET_PRESET_EXTRUDER_TEMP_PLA   205
-#define UI_SET_PRESET_HEATED_BED_TEMP_ABS 110
+#define UI_SET_PRESET_EXTRUDER_TEMP_PLA   210
+#define UI_SET_PRESET_HEATED_BED_TEMP_ABS 105
 #define UI_SET_PRESET_EXTRUDER_TEMP_ABS   220
 // Extreme values
 #define UI_SET_MIN_HEATED_BED_TEMP  30
