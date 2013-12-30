@@ -144,7 +144,7 @@ If a motor turns in the wrong direction change INVERT_X_DIR or INVERT_Y_DIR.
 /** \brief Number of steps for a 1mm move in x direction.
 For xy gantry use 2*belt moved!
 Overridden if EEPROM activated. */
-#define XAXIS_STEPS_PER_MM 98.425196
+#define XAXIS_STEPS_PER_MM (98.425196)
 /** \brief Number of steps for a 1mm move in y direction.
 For xy gantry use 2*belt moved!
 Overridden if EEPROM activated.*/
@@ -163,7 +163,7 @@ Overridden if EEPROM activated.*/
 #define EXT0_X_OFFSET 0
 #define EXT0_Y_OFFSET 0
 // for skeinforge 40 and later, steps to pull the plasic 1 mm inside the extruder, not out.  Overridden if EEPROM activated.
-#define EXT0_STEPS_PER_MM 95 //DT_PERFORMANCE
+#define EXT0_STEPS_PER_MM (95*2) //DT_PERFORMANCE 32TH STEPPING
 // What type of sensor is used?
 // 1 is 100k thermistor (Epcos B57560G0107F000 - RepRap-Fab.org and many other)
 // 2 is 200k thermistor
@@ -863,7 +863,7 @@ enabling this may cause to stall your moves when 20000Hz is reached.
 for some printers causing an early stall.
 
 */
-#define DOUBLE_STEP_DELAY 1 // time in microseconds
+#define DOUBLE_STEP_DELAY 1.9 // time in microseconds
 
 /** The firmware supports trajectory smoothing. To achieve this, it divides the stepsize by 2, resulting in
 the double computation cost. For slow movements this is not an issue, but for really fast moves this is
@@ -1038,7 +1038,7 @@ matches, the stored values are used to overwrite the settings.
 IMPORTANT: With mode <>0 some changes in Configuration.h are not set any more, as they are
            taken from the EEPROM.
 */
-#define EEPROM_MODE 2
+#define EEPROM_MODE 4
 
 
 /**************** duplicate motor driver ***************
