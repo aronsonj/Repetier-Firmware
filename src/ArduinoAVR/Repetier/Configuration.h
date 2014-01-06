@@ -665,9 +665,9 @@ on this endstop.
 
 // When you have several endstops in one circuit you need to disable it after homing by moving a
 // small amount back. This is also the case with H-belt systems.
-#define ENDSTOP_X_BACK_ON_HOME 5
-#define ENDSTOP_Y_BACK_ON_HOME 5
-#define ENDSTOP_Z_BACK_ON_HOME 5
+#define ENDSTOP_X_BACK_ON_HOME 7
+#define ENDSTOP_Y_BACK_ON_HOME 7
+#define ENDSTOP_Z_BACK_ON_HOME 7
 
 // You can disable endstop checking for print moves. This is needed, if you get sometimes
 // false signals from your endstops. If your endstops don't give false signals, you
@@ -766,8 +766,8 @@ If you don't do it, make sure to home first before your first move.
 
 /** To allow software correction of misaligned endstops, you can set the correction in steps here. If you have EEPROM enabled
 you can also change the values online and autoleveling will store the results here. */
-#define DELTA_X_ENDSTOP_OFFSET_STEPS 0
-#define DELTA_Y_ENDSTOP_OFFSET_STEPS 0
+#define DELTA_X_ENDSTOP_OFFSET_STEPS 164
+#define DELTA_Y_ENDSTOP_OFFSET_STEPS 110
 #define DELTA_Z_ENDSTOP_OFFSET_STEPS 0
 
 
@@ -892,7 +892,7 @@ Corner can be printed with full speed of 50 mm/s
 
 Overridden if EEPROM activated.
 */
-#define MAX_JERK 20.0
+#define MAX_JERK 15.0
 #define MAX_ZJERK 20.0
 
 /** \brief Number of moves we can cache in advance.
@@ -937,7 +937,7 @@ Without a correct adjusted advance algorithm, you get blobs at points, where acc
 effect increases with speed and acceleration difference. Using the advance method decreases this effect.
 For more informations, read the wiki.
 */
-#define USE_ADVANCE
+// #define USE_ADVANCE
 
 /** \brief enables quadratic component.
 
@@ -963,8 +963,8 @@ to activate the quadratic term. Only adds lots of computations and storage usage
  Overridden if EEPROM activated.
 */
 //#define BAUDRATE 76800
-// #define BAUDRATE 115200
-#define BAUDRATE 250000
+ #define BAUDRATE 115200
+//#define BAUDRATE 250000
 
 /**
 Some boards like Gen7 have a power on pin, to enable the atx power supply. If this is defined,
@@ -1018,7 +1018,7 @@ matches, the stored values are used to overwrite the settings.
 IMPORTANT: With mode <>0 some changes in Configuration.h are not set any more, as they are
            taken from the EEPROM.
 */
-#define EEPROM_MODE 4
+#define EEPROM_MODE 7
 
 
 /**************** duplicate motor driver ***************
@@ -1081,7 +1081,7 @@ is always running and is not hung up for some unknown reason. */
 // This is needful if you have the probe trigger by hand.
 #define Z_PROBE_WAIT_BEFORE_TEST false
 /** Speed of z-axis in mm/s when probing */
-#define Z_PROBE_SPEED 5
+#define Z_PROBE_SPEED 3
 #define Z_PROBE_XY_SPEED 100
 /** The height is the difference between activated probe position and nozzle height. */
 #define Z_PROBE_HEIGHT 6.6
@@ -1100,15 +1100,17 @@ is always running and is not hung up for some unknown reason. */
 */
 #define FEATURE_AUTOLEVEL true
 
-#define AR  75
+#define AR  65
 #define SQRT3 1.7320508
+#define ROT (-30 /(2*3.14159))
 
-#define Z_PROBE_X1 (-AR/2*SQRT3)
-#define Z_PROBE_Y1 (-AR/2)
-#define Z_PROBE_X2 (AR/2*SQRT3)
-#define Z_PROBE_Y2 (-AR/2)
-#define Z_PROBE_X3 0
-#define Z_PROBE_Y3 AR
+
+#define Z_PROBE_X1 ((-AR/2*SQRT3)*cos(ROT)-(-AR/2)*sin(ROT))
+#define Z_PROBE_Y1 ((-AR/2)*cos(ROT)+(-AR/2*SQRT3)*sin(ROT))
+#define Z_PROBE_X2 ((AR/2*SQRT3)*cos(ROT)-(-AR/2)*sin(ROT))
+#define Z_PROBE_Y2 ((-AR/2)*cos(ROT)+(AR/2*SQRT3)*sin(ROT))
+#define Z_PROBE_X3 (-AR*sin(ROT))
+#define Z_PROBE_Y3 (AR*cos(ROT))
 
 /* Define a pin to tuen light on/off */
 #define CASE_LIGHTS_PIN -1
