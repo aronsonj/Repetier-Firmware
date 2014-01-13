@@ -1082,8 +1082,12 @@ is always running and is not hung up for some unknown reason. */
 // This is needful if you have the probe trigger by hand.
 #define Z_PROBE_WAIT_BEFORE_TEST false
 /** Speed of z-axis in mm/s when probing */
+
 #define Z_PROBE_SPEED 3
 #define Z_PROBE_XY_SPEED 100
+#define Z_PROBE_SWITCHING_DISTANCE 1.5 // Distance to safely switch off probe
+#define Z_PROBE_REPETITIONS 5 // Repetitions for probing at one point. 
+
 /** The height is the difference between activated probe position and nozzle height. */
 #define Z_PROBE_HEIGHT 6.6
 /** These scripts are run before resp. after the z-probe is done. Add here code to activate/deactivate probe if needed. */
@@ -1219,7 +1223,7 @@ same setting.
 #define UI_SPEEDDEPENDENT_POSITIONING true
 
 /** \brief bounce time of keys in milliseconds */
-#define UI_KEY_BOUNCETIME 10
+#define UI_KEY_BOUNCETIME 50
 
 /** \brief First time in ms until repeat of action. */
 #define UI_KEY_FIRST_REPEAT 500
