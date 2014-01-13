@@ -1096,7 +1096,7 @@ is always running and is not hung up for some unknown reason. */
 #define Z_PROBE_FINISHED_SCRIPT ""
 
 // move down in the center to stay away from endstops before measuring
-#define Z_PROBE_INITIAL_Z_DOWN 200
+#define Z_PROBE_INITIAL_Z_POS 30
 
 
 /* Autoleveling allows it to z-probe 3 points to compute the inclination and compensates the error for the print.
@@ -1261,4 +1261,3 @@ Values must be in range 1..255
 
 #endif
 
-//#define GLENN_DEBUG
