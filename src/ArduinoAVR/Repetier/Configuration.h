@@ -666,9 +666,9 @@ on this endstop.
 
 // When you have several endstops in one circuit you need to disable it after homing by moving a
 // small amount back. This is also the case with H-belt systems.
-#define ENDSTOP_X_BACK_ON_HOME 7
-#define ENDSTOP_Y_BACK_ON_HOME 7
-#define ENDSTOP_Z_BACK_ON_HOME 7
+#define ENDSTOP_X_BACK_ON_HOME 5
+#define ENDSTOP_Y_BACK_ON_HOME 5
+#define ENDSTOP_Z_BACK_ON_HOME 5
 
 // You can disable endstop checking for print moves. This is needed, if you get sometimes
 // false signals from your endstops. If your endstops don't give false signals, you
@@ -681,7 +681,7 @@ on this endstop.
 // If EEPROM is enabled these values will be overidden with the values in the EEPROM
 #define X_MAX_LENGTH 200
 #define Y_MAX_LENGTH 200
-#define Z_MAX_LENGTH 252
+#define Z_MAX_LENGTH 283
 
 // Coordinates for the minimum axis. Can also be negative if you want to have the bed start at 0 and the printer can go to the left side
 // of the bed. Maximum coordinate is given by adding the above X_MAX_LENGTH values.
@@ -1076,7 +1076,7 @@ is always running and is not hung up for some unknown reason. */
 #define Z_PROBE_PIN Z_MIN_PIN //63
 #define Z_PROBE_PULLUP true
 #define Z_PROBE_ON_HIGH true
-#define Z_PROBE_X_OFFSET 23.7
+#define Z_PROBE_X_OFFSET 10    // SL, someone needs to measure this on the original KC
 #define Z_PROBE_Y_OFFSET 0
 // Waits for a signal to start. Valid signals are probe hit and ok button.
 // This is needful if you have the probe trigger by hand.
