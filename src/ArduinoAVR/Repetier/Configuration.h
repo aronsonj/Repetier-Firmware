@@ -164,7 +164,7 @@ Overridden if EEPROM activated.*/
 #define EXT0_X_OFFSET 0
 #define EXT0_Y_OFFSET 0
 // for skeinforge 40 and later, steps to pull the plasic 1 mm inside the extruder, not out.  Overridden if EEPROM activated.
-#define EXT0_STEPS_PER_MM (95*2) //DT_PERFORMANCE 32TH STEPPING
+#define EXT0_STEPS_PER_MM (100) 
 // What type of sensor is used?
 // 1 is 100k thermistor (Epcos B57560G0107F000 - RepRap-Fab.org and many other)
 // 2 is 200k thermistor
@@ -206,7 +206,7 @@ Overridden if EEPROM activated.*/
 #define EXT0_MAX_START_FEEDRATE 40
 // Acceleration in mm/s^2
 //  Overridden if EEPROM activated.
-#define EXT0_MAX_ACCELERATION 10000
+#define EXT0_MAX_ACCELERATION 3000
 /** Type of heat manager for this extruder.
 - 0 = Simply switch on/off if temperature is reached. Works always.
 - 1 = PID Temperature control. Is better but needs good PID values. Defaults are a good start for most extruder.
@@ -237,12 +237,12 @@ A good start is 30 lower then the optimal value. You need to leave room for cool
 */
 #define EXT0_PID_INTEGRAL_DRIVE_MIN 60
 /** P-gain. Dead-time if dead-time heat manager selected. Overridden if EEPROM activated. */
-#define EXT0_PID_P   10.32 //24
+#define EXT0_PID_P   22.2 //24
 /** I-gain. Overridden if EEPROM activated.
 */
-#define EXT0_PID_I   0.46 //0.88
+#define EXT0_PID_I   1.08 //0.88
 /** D-gain.  Overridden if EEPROM activated.*/
-#define EXT0_PID_D 57.34 //80
+#define EXT0_PID_D 114 //80
 // maximum time the heater can be switched on. Max = 255.  Overridden if EEPROM activated.
 #define EXT0_PID_MAX 255
 /** \brief Faktor for the advance algorithm. 0 disables the algorithm.  Overridden if EEPROM activated.
@@ -270,7 +270,7 @@ The codes are only executed for multiple extruder when changing the extruder. */
 #define EXT0_SELECT_COMMANDS "M117 Extruder 1"
 #define EXT0_DESELECT_COMMANDS ""
 /** The extruder cooler is a fan to cool the extruder when it is heating. If you turn the etxruder on, the fan goes on. */
-#define EXT0_EXTRUDER_COOLER_PIN 5
+#define EXT0_EXTRUDER_COOLER_PIN -1 
 /** PWM speed for the cooler fan. 0=off 255=full speed */
 #define EXT0_EXTRUDER_COOLER_SPEED 255
 
@@ -320,7 +320,7 @@ The codes are only executed for multiple extruder when changing the extruder. */
 #define EXT1_MAX_START_FEEDRATE 40
 // Acceleration in mm/s^2
 //  Overridden if EEPROM activated.
-#define EXT1_MAX_ACCELERATION 10000
+#define EXT1_MAX_ACCELERATION 3000
 /** Type of heat manager for this extruder.
 - 0 = Simply switch on/off if temperature is reached. Works always.
 - 1 = PID Temperature control. Is better but needs good PID values. Defaults are a good start for most extruder.
@@ -562,11 +562,11 @@ A good start is 30 lower then the optimal value. You need to leave room for cool
 */
 #define HEATED_BED_PID_INTEGRAL_DRIVE_MIN 80
 /** P-gain.  Overridden if EEPROM activated. */
-#define HEATED_BED_PID_PGAIN   196
+#define HEATED_BED_PID_PGAIN   10.0
 /** I-gain  Overridden if EEPROM activated.*/
-#define HEATED_BED_PID_IGAIN   33.02
+#define HEATED_BED_PID_IGAIN   0.023
 /** Dgain.  Overridden if EEPROM activated.*/
-#define HEATED_BED_PID_DGAIN 290
+#define HEATED_BED_PID_DGAIN 305.4
 // maximum time the heater can be switched on. Max = 255.  Overridden if EEPROM activated.
 #define HEATED_BED_PID_MAX 255
 
@@ -893,7 +893,7 @@ Corner can be printed with full speed of 50 mm/s
 
 Overridden if EEPROM activated.
 */
-#define MAX_JERK 15.0
+#define MAX_JERK 20.0
 #define MAX_ZJERK 20.0
 
 /** \brief Number of moves we can cache in advance.
@@ -1194,7 +1194,7 @@ Select the language to use.
 
 
 /** Animate switches between menus etc. */
-#define UI_ANIMATION true
+#define UI_ANIMATION false
 
 /** How many ms should a single page be shown, until it is switched to the next one.*/
 #define UI_PAGES_DURATION 4000
