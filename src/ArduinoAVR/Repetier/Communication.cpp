@@ -213,6 +213,7 @@ FSTRINGVALUE(Com::tZProbeStartScript,Z_PROBE_START_SCRIPT)
 FSTRINGVALUE(Com::tZProbeEndScript,Z_PROBE_FINISHED_SCRIPT)
 FSTRINGVALUE(Com::tHitZProbe,"Hit z-probe")
 FSTRINGVALUE(Com::tAutolevelReset,"Autolevel matrix reset")
+FSTRINGVALUE(Com::tZProbeAutolevelCommand,Z_PROBE_AUTOLEVEL_COMMAND)
 #endif
 FSTRINGVALUE(Com::tAutolevelEnabled,"Autoleveling enabled")
 FSTRINGVALUE(Com::tAutolevelDisabled,"Autoleveling disabled")

@@ -1098,6 +1098,10 @@ is always running and is not hung up for some unknown reason. */
 
 #define Z_PROBE_INITIAL_Z_POS 30
 
+// command to execute from menu for autolevel
+#define Z_PROBE_AUTOLEVEL_COMMAND "G32 S2"
+
+
 
 /* Autoleveling allows it to z-probe 3 points to compute the inclination and compensates the error for the print.
    This feature requires a working z-probe and you should have z-endstop at the top not at the bottom.

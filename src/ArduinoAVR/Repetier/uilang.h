@@ -233,6 +233,7 @@
 #define UI_TEXT_RESET_MEASUREMENT "Reset meas."
 #define UI_TEXT_SET_MEASURED_ORIGIN "Set Z=0"
 #define UI_TEXT_ZCALIB             "Z Calib."
+#define UI_TEXT_Z_AUTOCALIB         "Auto Calib Bed"
 #define UI_TEXT_SET_P1            "Set P1"
 #define UI_TEXT_SET_P2            "Set P2"
 #define UI_TEXT_SET_P3	          "Set P3"
