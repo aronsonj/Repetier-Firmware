@@ -1107,8 +1107,10 @@ is always running and is not hung up for some unknown reason. */
 
 #define AR  65
 #define SQRT3 1.7320508
-#define ROT (-30 /(2*3.14159))
 
+// Rotate the 3 test points around the center
+
+#define ROT (-30 /(2*3.14159))
 
 #define Z_PROBE_X1 ((-AR/2*SQRT3)*cos(ROT)-(-AR/2)*sin(ROT))
 #define Z_PROBE_Y1 ((-AR/2)*cos(ROT)+(-AR/2*SQRT3)*sin(ROT))
