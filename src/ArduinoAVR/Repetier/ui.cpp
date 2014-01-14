@@ -2796,6 +2796,11 @@ void UIDisplay::executeAction(int action)
         }
 #endif
         break;
+        case UI_ACTION_Z_AUTOCALIB:
+#if FEATURE_Z_PROBE
+         GCode::executeFString(Com::tZProbeAutolevelCommand);
+#endif
+        break;
         case UI_ACTION_FAN_UP:
             Commands::setFanSpeed(Printer::getFanSpeed()+32,false);
             break;

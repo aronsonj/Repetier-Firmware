@@ -209,6 +209,7 @@ FSTRINGVAR(tHitZProbe)
 FSTRINGVAR(tZProbeAverage)
 FSTRINGVAR(tZProbeZReset)
 FSTRINGVAR(tAutolevelReset)
+FSTRINGVAR(tZProbeAutolevelCommand)
 #endif
 FSTRINGVAR(tAutolevelEnabled)
 FSTRINGVAR(tAutolevelDisabled)
