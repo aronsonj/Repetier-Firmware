@@ -1,3 +1,6 @@
+# This is Repetier-Firmware adapted for Kossel Clear
+
+
 # Repetier-Firmware - the fast and user friendly firmware
 
 ## Installation
