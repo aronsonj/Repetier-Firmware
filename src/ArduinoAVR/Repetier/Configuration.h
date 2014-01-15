@@ -1096,10 +1096,10 @@ is always running and is not hung up for some unknown reason. */
 
 // move down in the center to stay away from endstops before measuring
 
-#define Z_PROBE_INITIAL_Z_POS 30
+#define Z_PROBE_INITIAL_Z_POS 20
 
 // command to execute from menu for autolevel
-#define Z_PROBE_AUTOLEVEL_COMMAND "G32 S2"
+#define Z_PROBE_AUTOLEVEL_COMMAND "G28\nG32 S2\n"
 
 
 
