@@ -1107,6 +1107,29 @@ void Commands::executeGCode(GCode *com)
                 Extruder::selectExtruderById(Extruder::current->id);
             }
             break;
+        case 99: // M99 S<time>
+            {
+                millis_t wait = 10000;
+                if(com->hasS())
+                    wait = 1000*com->S;
+                if(com->hasX())
+                    Printer::disableXStepper();
+                if(com->hasY())
+                    Printer::disableYStepper();
+                if(com->hasZ())
+                    Printer::disableZStepper();
+                wait += HAL::timeInMilliseconds();
+                while(wait-HAL::timeInMilliseconds() < 100000) {
+                    Printer::defaultLoopActions();
+                }
+                if(com->hasX())
+                    Printer::enableXStepper();
+                if(com->hasY())
+                    Printer::enableYStepper();
+                if(com->hasZ())
+                    Printer::enableZStepper();
+            }
+            break;
         case 111:
             if(com->hasS()) Printer::debugLevel = com->S;
             if(Printer::debugDryrun())   // simulate movements without printing
@@ -1376,6 +1399,7 @@ void Commands::executeGCode(GCode *com)
                     s = com->S;
                 HAL::servoMicroseconds(com->P,s);
             }
+            break;
 #endif // FEATURE_SERVO
 #if Z_HOME_DIR>0 && MAX_HARDWARE_ENDSTOP_Z
         case 251:
