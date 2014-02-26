@@ -149,12 +149,13 @@ void Commands::printTemperatures(bool showRaw)
     float temp = Extruder::current->tempControl.currentTemperatureC;
 #if HEATED_BED_SENSOR_TYPE==0
     Com::printF(Com::tTColon,temp);
+    Com::printF(Com::tSpaceSlash,Extruder::current->tempControl.targetTemperatureC,0);
 #else
     Com::printF(Com::tTColon,temp);
     Com::printF(Com::tSpaceSlash,Extruder::current->tempControl.targetTemperatureC,0);
+#if HAVE_HEATED_BED
     Com::printF(Com::tSpaceBColon,Extruder::getHeatedBedTemperature());
     Com::printF(Com::tSpaceSlash,heatedBedController.targetTemperatureC,0);
-#if HAVE_HEATED_BED
     if(showRaw)
     {
         Com::printF(Com::tSpaceRaw,(int)NUM_EXTRUDER);
@@ -623,11 +624,21 @@ void Commands::executeGCode(GCode *com)
             Com::printFLN(Com::tZProbeAverage,sum);
             if(com->hasS() && com->S)
             {
-                Printer::currentPositionSteps[Z_AXIS] = sum * Printer::axisStepsPerMM[Z_AXIS];
-                Com::printInfoFLN(Com::tZProbeZReset);
 #if MAX_HARDWARE_ENDSTOP_Z
+#if DRIVE_SYSTEM == 3
+                Printer::updateCurrentPosition();
+                Printer::zLength += sum - Printer::currentPosition[Z_AXIS];
+                Printer::updateDerivedParameter();
+                Printer::homeAxis(true,true,true);
+#else
+                Printer::currentPositionSteps[Z_AXIS] = sum * Printer::axisStepsPerMM[Z_AXIS];
                 Printer::zLength = Printer::runZMaxProbe() + sum-ENDSTOP_Z_BACK_ON_HOME;
+#endif
+                Com::printInfoFLN(Com::tZProbeZReset);
                 Com::printFLN(Com::tZProbePrinterHeight,Printer::zLength);
+#else
+                Printer::currentPositionSteps[Z_AXIS] = sum * Printer::axisStepsPerMM[Z_AXIS];
+                Com::printFLN(PSTR("Adjusted z origin"));
 #endif
             }
             Printer::feedrate = oldFeedrate;
