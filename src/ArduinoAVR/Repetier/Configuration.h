@@ -863,7 +863,7 @@ enabling this may cause to stall your moves when 20000Hz is reached.
 for some printers causing an early stall.
 
 */
-#define DOUBLE_STEP_DELAY 1.9 // time in microseconds
+#define DOUBLE_STEP_DELAY 2 // time in microseconds
 
 /** The firmware supports trajectory smoothing. To achieve this, it divides the stepsize by 2, resulting in
 the double computation cost. For slow movements this is not an issue, but for really fast moves this is
