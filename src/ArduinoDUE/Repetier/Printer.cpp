@@ -494,7 +494,7 @@ uint8_t Printer::setDestinationStepsFromGCode(GCode *com)
         else
             feedrate = com->F * (float)feedrateMultiply * 0.00016666666f;
     }
-    if(!Printer::isPositionAllowed(x,y,z)) {
+    if(!Printer::isPositionAllowed(lastCmdPos[X_AXIS],lastCmdPos[Y_AXIS], lastCmdPos[Z_AXIS])) {
         currentPositionSteps[E_AXIS] = destinationSteps[E_AXIS];
         return false; // ignore move
     }
@@ -870,7 +870,7 @@ void Printer::homeYAxis()
 void Printer::homeZAxis() // Delta z homing
 {
     deltaMoveToTopEndstops(Printer::homingFeedrate[Z_AXIS]);
-    PrintLine::moveRelativeDistanceInSteps(0,0,axisStepsPerMM[Z_AXIS]*-ENDSTOP_Z_BACK_MOVE,0,Printer::homingFeedrate[Z_AXIS]/ENDSTOP_X_RETEST_REDUCTION_FACTOR, true, false);
+    PrintLine::moveRelativeDistanceInSteps(0,0,2*axisStepsPerMM[Z_AXIS]*-ENDSTOP_Z_BACK_MOVE,0,Printer::homingFeedrate[Z_AXIS]/ENDSTOP_X_RETEST_REDUCTION_FACTOR, true, false);
     deltaMoveToTopEndstops(Printer::homingFeedrate[Z_AXIS]/ENDSTOP_X_RETEST_REDUCTION_FACTOR);
 #if defined(ENDSTOP_Z_BACK_ON_HOME)
     if(ENDSTOP_Z_BACK_ON_HOME > 0)
@@ -1197,6 +1197,9 @@ void Printer::setAutolevelActive(bool on)
 #if MAX_HARDWARE_ENDSTOP_Z
 float Printer::runZMaxProbe()
 {
+#if NONLINEAR_SYSTEM
+    long startZ = realDeltaPositionSteps[Z_AXIS] = currentDeltaPositionSteps[Z_AXIS]; // update real
+#endif
     Commands::waitUntilEndOfAllMoves();
     long probeDepth = 2*(Printer::zMaxSteps-Printer::zMinSteps);
     stepsRemainingAtZHit = -1;
@@ -1209,7 +1212,11 @@ float Printer::runZMaxProbe()
     }
     setZProbingActive(false);
     currentPositionSteps[Z_AXIS] -= stepsRemainingAtZHit;
+#if NONLINEAR_SYSTEM
+    probeDepth -= (realDeltaPositionSteps[Z_AXIS] - startZ);
+#else
     probeDepth -= stepsRemainingAtZHit;
+#endif
     float distance = (float)probeDepth*invAxisStepsPerMM[Z_AXIS];
     Com::printF(Com::tZProbeMax,distance);
     Com::printF(Com::tSpaceXColon,realXPosition());
@@ -1220,13 +1227,14 @@ float Printer::runZMaxProbe()
 #endif
 
 #if FEATURE_Z_PROBE
-float Printer::runZProbe(bool first,bool last,uint8_t repeat)
+float Printer::runZProbe(bool first,bool last,uint8_t repeat,bool runStartScript)
 {
     float oldOffX =  Printer::offsetX;
     float oldOffY =  Printer::offsetY;
     if(first)
     {
-        GCode::executeFString(Com::tZProbeStartScript);
+        if(runStartScript)
+            GCode::executeFString(Com::tZProbeStartScript);
         Printer::offsetX = -EEPROM::zProbeXOffset();
         Printer::offsetY = -EEPROM::zProbeYOffset();
         PrintLine::moveRelativeDistanceInSteps((Printer::offsetX - oldOffX) * Printer::axisStepsPerMM[X_AXIS],
@@ -1235,6 +1243,9 @@ float Printer::runZProbe(bool first,bool last,uint8_t repeat)
     Commands::waitUntilEndOfAllMoves();
     int32_t sum = 0,probeDepth,shortMove = (int32_t)((float)Z_PROBE_SWITCHING_DISTANCE*axisStepsPerMM[Z_AXIS]);
     int32_t lastCorrection = currentPositionSteps[Z_AXIS];
+#if NONLINEAR_SYSTEM
+    realDeltaPositionSteps[Z_AXIS] = currentDeltaPositionSteps[Z_AXIS]; // update real
+#endif
     int32_t updateZ = 0;
     for(uint8_t r=0; r<repeat; r++)
     {
@@ -1245,9 +1256,6 @@ float Printer::runZProbe(bool first,bool last,uint8_t repeat)
         //PrintLine::moveRelativeDistanceInSteps(-offx,-offy,0,0,EEPROM::zProbeXYSpeed(),true,true);
         waitForZProbeStart();
         setZProbingActive(true);
-#if NONLINEAR_SYSTEM
-        int32_t zStart = realDeltaPositionSteps[Z_AXIS];
-#endif
         PrintLine::moveRelativeDistanceInSteps(0,0,-probeDepth,0,EEPROM::zProbeSpeed(),true,true);
         if(stepsRemainingAtZHit<0)
         {
@@ -1256,7 +1264,7 @@ float Printer::runZProbe(bool first,bool last,uint8_t repeat)
         }
         setZProbingActive(false);
 #if NONLINEAR_SYSTEM
-        stepsRemainingAtZHit = probeDepth + realDeltaPositionSteps[Z_AXIS] - zStart;
+        stepsRemainingAtZHit = realDeltaPositionSteps[Z_AXIS] - currentDeltaPositionSteps[Z_AXIS];
 #endif
 #if DRIVE_SYSTEM == 3
         currentDeltaPositionSteps[X_AXIS] += stepsRemainingAtZHit;

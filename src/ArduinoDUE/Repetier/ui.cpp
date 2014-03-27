@@ -25,15 +25,6 @@ extern const int8_t encoder_table[16] PROGMEM ;
 #include <ctype.h>
 
 
-#if UI_ENCODER_SPEED==0
-const int8_t encoder_table[16] PROGMEM = {0,1,-1,0,-1,0,0,1,1,0,0,-1,0,-1,1,0}; // Full speed
-#elif UI_ENCODER_SPEED==1
-const int8_t encoder_table[16] PROGMEM = {0,0,-1,0,0,0,0,1,1,0,0,0,0,-1,0,0}; // Half speed
-#else
-//const int8_t encoder_table[16] PROGMEM = {0,0,0,0,0,0,0,0,1,0,0,0,0,-1,0,0}; // Quart speed
-//const int8_t encoder_table[16] PROGMEM = {0,1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0}; // Quart speed
-const int8_t encoder_table[16] PROGMEM = {0,0,0,0,0,0,0,0,0,0,0,-1,0,0,1,0}; // Quart speed
-#endif
 
 
 #if BEEPER_TYPE==2 && defined(UI_HAS_I2C_KEYS) && UI_I2C_KEY_ADDRESS!=BEEPER_ADDRESS
@@ -386,9 +377,17 @@ void lcdWriteNibble(uint8_t value)
     WRITE(UI_DISPLAY_D6_PIN,value & 4);
     WRITE(UI_DISPLAY_D7_PIN,value & 8);
     WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);// enable pulse must be >450ns
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
     WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
 }
 void lcdWriteByte(uint8_t c,uint8_t rs)
 {
@@ -405,14 +404,30 @@ void lcdWriteByte(uint8_t c,uint8_t rs)
     do
     {
         WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);
+#if CPU_ARCH == ARCH_AVR
         __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
         busy = READ(UI_DISPLAY_D7_PIN);
         WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
         __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+        HAL::delayMicroseconds(1);
+#endif
         WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);
+#if CPU_ARCH == ARCH_AVR
         __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
         WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
         __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+        HAL::delayMicroseconds(1);
+#endif
     }
     while (busy);
     SET_OUTPUT(UI_DISPLAY_D4_PIN);
@@ -428,18 +443,34 @@ void lcdWriteByte(uint8_t c,uint8_t rs)
     WRITE(UI_DISPLAY_D6_PIN, c & 0x40);
     WRITE(UI_DISPLAY_D7_PIN, c & 0x80);
     WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);   // enable pulse must be >450ns
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
     WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
 
     WRITE(UI_DISPLAY_D4_PIN, c & 0x01);
     WRITE(UI_DISPLAY_D5_PIN, c & 0x02);
     WRITE(UI_DISPLAY_D6_PIN, c & 0x04);
     WRITE(UI_DISPLAY_D7_PIN, c & 0x08);
     WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);   // enable pulse must be >450ns
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
     WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
 }
 void initializeLCD()
 {
@@ -3057,6 +3088,15 @@ void UIDisplay::fastAction()
     HAL::allowInterrupts();
 #endif
 }
+#if UI_ENCODER_SPEED==0
+const int8_t encoder_table[16] PROGMEM = {0,1,-1,0,-1,0,0,1,1,0,0,-1,0,-1,1,0}; // Full speed
+#elif UI_ENCODER_SPEED==1
+const int8_t encoder_table[16] PROGMEM = {0,0,-1,0,0,0,0,1,1,0,0,0,0,-1,0,0}; // Half speed
+#else
+//const int8_t encoder_table[16] PROGMEM = {0,0,0,0,0,0,0,0,1,0,0,0,0,-1,0,0}; // Quart speed
+//const int8_t encoder_table[16] PROGMEM = {0,1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0}; // Quart speed
+const int8_t encoder_table[16] PROGMEM = {0,0,0,0,0,0,0,0,0,0,0,-1,0,0,1,0}; // Quart speed
+#endif
 
 #endif
 

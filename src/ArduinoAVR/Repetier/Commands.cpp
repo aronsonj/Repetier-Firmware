@@ -608,11 +608,12 @@ void Commands::executeGCode(GCode *com)
 #if FEATURE_Z_PROBE
         case 29: // 3 points, build average
         {
+            GCode::executeFString(Com::tZProbeStartScript);
             bool oldAutolevel = Printer::isAutolevelActive();
             Printer::setAutolevelActive(false);
             float sum = 0,last,oldFeedrate = Printer::feedrate;
             Printer::moveTo(EEPROM::zProbeX1(),EEPROM::zProbeY1(),IGNORE_COORDINATE,IGNORE_COORDINATE,EEPROM::zProbeXYSpeed());
-            sum = Printer::runZProbe(true,false);
+            sum = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false);
             if(sum<0) break;
             Printer::moveTo(EEPROM::zProbeX2(),EEPROM::zProbeY2(),IGNORE_COORDINATE,IGNORE_COORDINATE,EEPROM::zProbeXYSpeed());
             last = Printer::runZProbe(false,false);
@@ -670,6 +671,7 @@ void Commands::executeGCode(GCode *com)
 #if FEATURE_AUTOLEVEL
         case 32: // G32 Auto-Bed leveling
         {
+            GCode::executeFString(Com::tZProbeStartScript);
             //bool iterate = com->hasP() && com->P>0;
             Printer::coordinateOffset[0] = Printer::coordinateOffset[1] = Printer::coordinateOffset[2] = 0;
             Printer::setAutolevelActive(false); // iterate
@@ -677,7 +679,7 @@ void Commands::executeGCode(GCode *com)
             Printer::moveTo(0,0,Z_PROBE_INITIAL_Z_POS,IGNORE_COORDINATE,EEPROM::zProbeXYSpeed());
             
             Printer::moveTo(EEPROM::zProbeX1(),EEPROM::zProbeY1(),IGNORE_COORDINATE,IGNORE_COORDINATE,EEPROM::zProbeXYSpeed());
-            h1 = Printer::runZProbe(true,false);
+            h1 = Printer::runZProbe(true,false,Z_PROBE_REPETITIONS,false);
             if(h1<0) break;
             Printer::moveTo(EEPROM::zProbeX2(),EEPROM::zProbeY2(),IGNORE_COORDINATE,IGNORE_COORDINATE,EEPROM::zProbeXYSpeed());
             h2 = Printer::runZProbe(false,false);
@@ -817,18 +819,20 @@ void Commands::executeGCode(GCode *com)
             Printer::homeAxis(true,true,true);
             }
             break;
-        case 134:
+ /*       case 134:
             Com::printF(PSTR("CompDelta:"),Printer::currentDeltaPositionSteps[X_AXIS]);
             Com::printF(Com::tComma,Printer::currentDeltaPositionSteps[Y_AXIS]);
             Com::printFLN(Com::tComma,Printer::currentDeltaPositionSteps[Z_AXIS]);
+#ifdef DEBUG_REAL_POSITION
             Com::printF(PSTR("RealDelta:"),Printer::realDeltaPositionSteps[X_AXIS]);
             Com::printF(Com::tComma,Printer::realDeltaPositionSteps[Y_AXIS]);
             Com::printFLN(Com::tComma,Printer::realDeltaPositionSteps[Z_AXIS]);
+#endif
             Printer::updateCurrentPosition();
             Com::printF(PSTR("PosFromSteps:"));
             printCurrentPosition();
             break;
-
+*/
 #endif // DRIVE_SYSTEM
         }
         previousMillisCmd = HAL::timeInMilliseconds();
@@ -1489,7 +1493,7 @@ void Commands::executeGCode(GCode *com)
                 Printer::maxRealJerk = 0;
             break;
 #endif
-        case 535:
+/*        case 535:
             Com::printF(PSTR("Last commanded position:"),Printer::lastCmdPos[X_AXIS]);
             Com::printF(Com::tComma,Printer::lastCmdPos[Y_AXIS]);
             Com::printFLN(Com::tComma,Printer::lastCmdPos[Z_AXIS]);
@@ -1504,7 +1508,7 @@ void Commands::executeGCode(GCode *com)
             Com::printF(Com::tComma,Printer::currentDeltaPositionSteps[Y_AXIS]);
             Com::printFLN(Com::tComma,Printer::currentDeltaPositionSteps[Z_AXIS]);
 #endif // NONLINEAR_SYSTEM
-            break;
+            break;*/
         }
     }
     else if(com->hasT())      // Process T code
