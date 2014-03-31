@@ -25,15 +25,6 @@ extern const int8_t encoder_table[16] PROGMEM ;
 #include <ctype.h>
 
 
-#if UI_ENCODER_SPEED==0
-const int8_t encoder_table[16] PROGMEM = {0,1,-1,0,-1,0,0,1,1,0,0,-1,0,-1,1,0}; // Full speed
-#elif UI_ENCODER_SPEED==1
-const int8_t encoder_table[16] PROGMEM = {0,0,-1,0,0,0,0,1,1,0,0,0,0,-1,0,0}; // Half speed
-#else
-//const int8_t encoder_table[16] PROGMEM = {0,0,0,0,0,0,0,0,1,0,0,0,0,-1,0,0}; // Quart speed
-//const int8_t encoder_table[16] PROGMEM = {0,1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0}; // Quart speed
-const int8_t encoder_table[16] PROGMEM = {0,0,0,0,0,0,0,0,0,0,0,-1,0,0,1,0}; // Quart speed
-#endif
 
 
 #if BEEPER_TYPE==2 && defined(UI_HAS_I2C_KEYS) && UI_I2C_KEY_ADDRESS!=BEEPER_ADDRESS
@@ -346,7 +337,7 @@ void initializeLCD()
     lcdStartWrite();
     HAL::i2cWrite(uid.outputMask & 255);
 #if UI_DISPLAY_I2C_CHIPTYPE==1
-    HAL::i2cWrite(uid.outputMask >> 16);
+    HAL::i2cWrite(uid.outputMask >> 8);
 #endif
     HAL::delayMicroseconds(10);
     lcdWriteNibble(0x03);
@@ -386,9 +377,17 @@ void lcdWriteNibble(uint8_t value)
     WRITE(UI_DISPLAY_D6_PIN,value & 4);
     WRITE(UI_DISPLAY_D7_PIN,value & 8);
     WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);// enable pulse must be >450ns
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
     WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
 }
 void lcdWriteByte(uint8_t c,uint8_t rs)
 {
@@ -405,14 +404,30 @@ void lcdWriteByte(uint8_t c,uint8_t rs)
     do
     {
         WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);
+#if CPU_ARCH == ARCH_AVR
         __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
         busy = READ(UI_DISPLAY_D7_PIN);
         WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
         __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+        HAL::delayMicroseconds(1);
+#endif
         WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);
+#if CPU_ARCH == ARCH_AVR
         __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
         WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
         __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+        HAL::delayMicroseconds(1);
+#endif
     }
     while (busy);
     SET_OUTPUT(UI_DISPLAY_D4_PIN);
@@ -428,18 +443,34 @@ void lcdWriteByte(uint8_t c,uint8_t rs)
     WRITE(UI_DISPLAY_D6_PIN, c & 0x40);
     WRITE(UI_DISPLAY_D7_PIN, c & 0x80);
     WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);   // enable pulse must be >450ns
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
     WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
 
     WRITE(UI_DISPLAY_D4_PIN, c & 0x01);
     WRITE(UI_DISPLAY_D5_PIN, c & 0x02);
     WRITE(UI_DISPLAY_D6_PIN, c & 0x04);
     WRITE(UI_DISPLAY_D7_PIN, c & 0x08);
     WRITE(UI_DISPLAY_ENABLE_PIN, HIGH);   // enable pulse must be >450ns
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
     WRITE(UI_DISPLAY_ENABLE_PIN, LOW);
+#if CPU_ARCH == ARCH_AVR
     __asm__("nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t""nop\n\t");
+#else
+    HAL::delayMicroseconds(1);
+#endif
 }
 void initializeLCD()
 {
@@ -1067,8 +1098,8 @@ void UIDisplay::parse(char *txt,bool ram)
             else if(c2=='Z') addFloat(Printer::homingFeedrate[2],5,0);
             break;
         case 'i':
-            if(c2=='s') addLong(stepperInactiveTime,4);
-            else if(c2=='p') addLong(maxInactiveTime,4);
+            if(c2=='s') addLong(stepperInactiveTime/1000,4);
+            else if(c2=='p') addLong(maxInactiveTime/1000,4);
             break;
         case 'O': // ops related stuff
             break;
@@ -1310,7 +1341,7 @@ void UIDisplay::parse(char *txt,bool ram)
                 addStringP(PSTR(UI_TEXT_PRINTTIME_HOURS));
                 seconds-=tmp*3600;
                 tmp = seconds/60;
-                addInt(tmp,2,0);
+                addInt(tmp,2,'0');
                 addStringP(PSTR(UI_TEXT_PRINTTIME_MINUTES));
 #endif
             }
@@ -1325,8 +1356,9 @@ void UIDisplay::parse(char *txt,bool ram)
     }
     printCols[col] = 0;
 }
-void UIDisplay::setStatusP(PGM_P txt)
+void UIDisplay::setStatusP(PGM_P txt,bool error)
 {
+    if(!error && Printer::isUIErrorMessage()) return;
     uint8_t i=0;
     while(i<16)
     {
@@ -1335,13 +1367,18 @@ void UIDisplay::setStatusP(PGM_P txt)
         statusMsg[i++] = c;
     }
     statusMsg[i]=0;
+    if(error)
+        Printer::setUIErrorMessage(true);
 }
-void UIDisplay::setStatus(char *txt)
+void UIDisplay::setStatus(char *txt,bool error)
 {
+    if(!error && Printer::isUIErrorMessage()) return;
     uint8_t i=0;
     while(*txt && i<16)
         statusMsg[i++] = *txt++;
     statusMsg[i]=0;
+    if(error)
+        Printer::setUIErrorMessage(true);
 }
 
 const UIMenu * const ui_pages[UI_NUM_PAGES] PROGMEM = UI_PAGES;
@@ -1833,6 +1870,10 @@ void UIDisplay::pushMenu(void *men,bool refresh)
 }
 void UIDisplay::okAction()
 {
+    if(Printer::isUIErrorMessage()) {
+        Printer::setUIErrorMessage(false);
+        return;
+    }
 #if UI_HAS_KEYS==1
     if(menuLevel==0)   // Enter menu
     {
@@ -1948,7 +1989,9 @@ void UIDisplay::okAction()
     executeAction(UI_ACTION_BACK);
 #endif
 }
-#define INCREMENT_MIN_MAX(a,steps,_min,_max) a+=increment*steps;if(a<(_min)) a=_min;else if(a>(_max)) a=_max;
+
+#define INCREMENT_MIN_MAX(a,steps,_min,_max) if ( (increment<0) && (_min>=0) && (a<_min-increment*steps) ) {a=_min;} else { a+=increment*steps; if(a<_min) a=_min; else if(a>_max) a=_max;};
+
 void UIDisplay::adjustMenuPos()
 {
     if(menuLevel == 0) return;
@@ -1986,6 +2029,10 @@ void UIDisplay::adjustMenuPos()
 
 void UIDisplay::nextPreviousAction(int8_t next)
 {
+    if(Printer::isUIErrorMessage()) {
+        Printer::setUIErrorMessage(false);
+        return;
+    }
     millis_t actTime = HAL::timeInMilliseconds();
     millis_t dtReal;
     millis_t dt = dtReal = actTime-lastNextPrev;
@@ -2080,10 +2127,10 @@ void UIDisplay::nextPreviousAction(int8_t next)
             d *= Printer::maxFeedrate[X_AXIS]*dtReal/(2000*fabs(d));
         long steps = (long)(d*Printer::axisStepsPerMM[X_AXIS]);
         steps = ( increment<0 ? RMath::min(steps,(long)increment) : RMath::max(steps,(long)increment));
-        PrintLine::moveRelativeDistanceInSteps(steps,0,0,0,Printer::maxFeedrate[2],true,true);
+        PrintLine::moveRelativeDistanceInStepsReal(steps,0,0,0,Printer::maxFeedrate[X_AXIS],true);
     }
 #else
-    PrintLine::moveRelativeDistanceInSteps(increment,0,0,0,Printer::homingFeedrate[0],true,true);
+    PrintLine::moveRelativeDistanceInStepsReal(increment,0,0,0,Printer::homingFeedrate[X_AXIS],true);
 #endif
     Commands::printCurrentPosition();
     break;
@@ -2095,10 +2142,10 @@ void UIDisplay::nextPreviousAction(int8_t next)
             d *= Printer::maxFeedrate[Y_AXIS]*dtReal/(2000*fabs(d));
         long steps = (long)(d*Printer::axisStepsPerMM[Y_AXIS]);
         steps = ( increment<0 ? RMath::min(steps,(long)increment) : RMath::max(steps,(long)increment));
-        PrintLine::moveRelativeDistanceInSteps(0,steps,0,0,Printer::maxFeedrate[2],true,true);
+        PrintLine::moveRelativeDistanceInStepsReal(0,steps,0,0,Printer::maxFeedrate[Y_AXIS],true);
     }
 #else
-    PrintLine::moveRelativeDistanceInSteps(0,increment,0,0,Printer::homingFeedrate[1],true,true);
+    PrintLine::moveRelativeDistanceInStepsReal(0,increment,0,0,Printer::homingFeedrate[Y_AXIS],true);
 #endif
     Commands::printCurrentPosition();
     break;
@@ -2110,28 +2157,63 @@ void UIDisplay::nextPreviousAction(int8_t next)
             d *= Printer::maxFeedrate[Z_AXIS]*dtReal/(2000*fabs(d));
         long steps = (long)(d*Printer::axisStepsPerMM[Z_AXIS]);
         steps = ( increment<0 ? RMath::min(steps,(long)increment) : RMath::max(steps,(long)increment));
-        PrintLine::moveRelativeDistanceInSteps(0,0,steps,0,Printer::maxFeedrate[2],true,true);
+        PrintLine::moveRelativeDistanceInStepsReal(0,0,steps,0,Printer::maxFeedrate[Z_AXIS],true);
     }
 #else
-    PrintLine::moveRelativeDistanceInSteps(0,0,increment,0,Printer::homingFeedrate[2],true,true);
+    PrintLine::moveRelativeDistanceInStepsReal(0,0,increment,0,Printer::homingFeedrate[Z_AXIS],true);
 #endif
     Commands::printCurrentPosition();
     break;
     case UI_ACTION_XPOSITION_FAST:
-        PrintLine::moveRelativeDistanceInSteps(Printer::axisStepsPerMM[0]*increment,0,0,0,Printer::homingFeedrate[0],true,true);
+        PrintLine::moveRelativeDistanceInStepsReal(Printer::axisStepsPerMM[0]*increment,0,0,0,Printer::homingFeedrate[0],true);
         Commands::printCurrentPosition();
         break;
     case UI_ACTION_YPOSITION_FAST:
-        PrintLine::moveRelativeDistanceInSteps(0,Printer::axisStepsPerMM[1]*increment,0,0,Printer::homingFeedrate[1],true,true);
+        PrintLine::moveRelativeDistanceInStepsReal(0,Printer::axisStepsPerMM[1]*increment,0,0,Printer::homingFeedrate[1],true);
         Commands::printCurrentPosition();
         break;
     case UI_ACTION_ZPOSITION_FAST:
-        PrintLine::moveRelativeDistanceInSteps(0,0,Printer::axisStepsPerMM[2]*increment,0,Printer::homingFeedrate[2],true,true);
+        PrintLine::moveRelativeDistanceInStepsReal(0,0,Printer::axisStepsPerMM[2]*increment,0,Printer::homingFeedrate[2],true);
         Commands::printCurrentPosition();
         break;
     case UI_ACTION_EPOSITION:
         PrintLine::moveRelativeDistanceInSteps(0,0,0,Printer::axisStepsPerMM[3]*increment,UI_SET_EXTRUDER_FEEDRATE,true,false);
         Commands::printCurrentPosition();
+        break;
+    case UI_ACTION_ZPOSITION_NOTEST:
+        Printer::setNoDestinationCheck(true);
+#if UI_SPEEDDEPENDENT_POSITIONING
+    {
+        float d = 0.01*(float)increment*lastNextAccumul;
+        if(fabs(d)*2000>Printer::maxFeedrate[Z_AXIS]*dtReal)
+            d *= Printer::maxFeedrate[Z_AXIS]*dtReal/(2000*fabs(d));
+        long steps = (long)(d*Printer::axisStepsPerMM[Z_AXIS]);
+        steps = ( increment<0 ? RMath::min(steps,(long)increment) : RMath::max(steps,(long)increment));
+        PrintLine::moveRelativeDistanceInStepsReal(0,0,steps,0,Printer::maxFeedrate[Z_AXIS],true);
+    }
+#else
+    PrintLine::moveRelativeDistanceInStepsReal(0,0,increment,0,Printer::homingFeedrate[Z_AXIS],true);
+#endif
+        Commands::printCurrentPosition();
+        Printer::setNoDestinationCheck(false);
+    break;
+    case UI_ACTION_ZPOSITION_FAST_NOTEST:
+        Printer::setNoDestinationCheck(true);
+        PrintLine::moveRelativeDistanceInStepsReal(0,0,Printer::axisStepsPerMM[Z_AXIS]*increment,0,Printer::homingFeedrate[Z_AXIS],true);
+        Commands::printCurrentPosition();
+        Printer::setNoDestinationCheck(false);
+        break;
+    case UI_ACTION_Z_BABYSTEPS:
+        {
+            previousMillisCmd = HAL::timeInMilliseconds();
+            if(increment > 0) {
+                if((int)Printer::zBabystepsMissing+BABYSTEP_MULTIPLICATOR<127)
+                    Printer::zBabystepsMissing+=BABYSTEP_MULTIPLICATOR;
+            } else {
+                if((int)Printer::zBabystepsMissing-BABYSTEP_MULTIPLICATOR>-127)
+                    Printer::zBabystepsMissing-=BABYSTEP_MULTIPLICATOR;
+            }
+        }
         break;
     case UI_ACTION_HEATED_BED_TEMP:
 #if HAVE_HEATED_BED==true
@@ -2183,10 +2265,12 @@ void UIDisplay::nextPreviousAction(int8_t next)
     }
     break;
     case UI_ACTION_STEPPER_INACTIVE:
-        INCREMENT_MIN_MAX(stepperInactiveTime,60,0,9999);
+        stepperInactiveTime -= stepperInactiveTime % 1000;
+        INCREMENT_MIN_MAX(stepperInactiveTime,60000UL,0,10080000UL);
         break;
     case UI_ACTION_MAX_INACTIVE:
-        INCREMENT_MIN_MAX(maxInactiveTime,60,0,9999);
+        maxInactiveTime -= maxInactiveTime % 1000;
+        INCREMENT_MIN_MAX(maxInactiveTime,60000UL,0,10080000UL);
         break;
     case UI_ACTION_PRINT_ACCEL_X:
         INCREMENT_MIN_MAX(Printer::maxAccelerationMMPerSquareSecond[X_AXIS],100,0,10000);
@@ -2262,7 +2346,7 @@ void UIDisplay::nextPreviousAction(int8_t next)
 #if EEPROM_MODE!=0
     {
         char p=0;
-        long rate;
+        int32_t rate;
         do
         {
             rate = pgm_read_dword(&(baudrates[p]));
@@ -2686,28 +2770,28 @@ void UIDisplay::executeAction(int action)
             break;
 #endif
         case UI_ACTION_X_UP:
-            PrintLine::moveRelativeDistanceInSteps(Printer::axisStepsPerMM[0],0,0,0,Printer::homingFeedrate[0],false,true);
+            PrintLine::moveRelativeDistanceInStepsReal(Printer::axisStepsPerMM[X_AXIS],0,0,0,Printer::homingFeedrate[X_AXIS],false);
             break;
         case UI_ACTION_X_DOWN:
-            PrintLine::moveRelativeDistanceInSteps(-Printer::axisStepsPerMM[0],0,0,0,Printer::homingFeedrate[0],false,true);
+            PrintLine::moveRelativeDistanceInStepsReal(-Printer::axisStepsPerMM[X_AXIS],0,0,0,Printer::homingFeedrate[X_AXIS],false);
             break;
         case UI_ACTION_Y_UP:
-            PrintLine::moveRelativeDistanceInSteps(0,Printer::axisStepsPerMM[1],0,0,Printer::homingFeedrate[1],false,true);
+            PrintLine::moveRelativeDistanceInStepsReal(0,Printer::axisStepsPerMM[1],0,0,Printer::homingFeedrate[1],false);
             break;
         case UI_ACTION_Y_DOWN:
-            PrintLine::moveRelativeDistanceInSteps(0,-Printer::axisStepsPerMM[1],0,0,Printer::homingFeedrate[1],false,true);
+            PrintLine::moveRelativeDistanceInStepsReal(0,-Printer::axisStepsPerMM[1],0,0,Printer::homingFeedrate[1],false);
             break;
         case UI_ACTION_Z_UP:
-            PrintLine::moveRelativeDistanceInSteps(0,0,Printer::axisStepsPerMM[2],0,Printer::homingFeedrate[2],false,true);
+            PrintLine::moveRelativeDistanceInStepsReal(0,0,Printer::axisStepsPerMM[2],0,Printer::homingFeedrate[2],false);
             break;
         case UI_ACTION_Z_DOWN:
-            PrintLine::moveRelativeDistanceInSteps(0,0,-Printer::axisStepsPerMM[2],0,Printer::homingFeedrate[2],false,true);
+            PrintLine::moveRelativeDistanceInStepsReal(0,0,-Printer::axisStepsPerMM[2],0,Printer::homingFeedrate[2],false);
             break;
         case UI_ACTION_EXTRUDER_UP:
-            PrintLine::moveRelativeDistanceInSteps(0,0,0,Printer::axisStepsPerMM[3],UI_SET_EXTRUDER_FEEDRATE,false,true);
+            PrintLine::moveRelativeDistanceInStepsReal(0,0,0,Printer::axisStepsPerMM[3],UI_SET_EXTRUDER_FEEDRATE,false);
             break;
         case UI_ACTION_EXTRUDER_DOWN:
-            PrintLine::moveRelativeDistanceInSteps(0,0,0,-Printer::axisStepsPerMM[3],UI_SET_EXTRUDER_FEEDRATE,false,true);
+            PrintLine::moveRelativeDistanceInStepsReal(0,0,0,-Printer::axisStepsPerMM[3],UI_SET_EXTRUDER_FEEDRATE,false);
             break;
         case UI_ACTION_EXTRUDER_TEMP_UP:
         {
@@ -2737,13 +2821,14 @@ void UIDisplay::executeAction(int action)
 #if MAX_HARDWARE_ENDSTOP_Z
         case UI_ACTION_SET_MEASURED_ORIGIN:
         {
+            Printer::updateCurrentPosition();
             Printer::zLength -= Printer::currentPosition[Z_AXIS];
             Printer::currentPositionSteps[Z_AXIS] = 0;
             Printer::updateDerivedParameter();
 #if NONLINEAR_SYSTEM
             transformCartesianStepsToDeltaSteps(Printer::currentPositionSteps, Printer::currentDeltaPositionSteps);
 #endif
-            Printer::updateCurrentPosition();
+            Printer::updateCurrentPosition(true);
             Com::printFLN(Com::tZProbePrinterHeight,Printer::zLength);
 #if EEPROM_MODE!=0
             EEPROM::storeDataIntoEEPROM(false);
@@ -2779,7 +2864,7 @@ void UIDisplay::executeAction(int action)
             break;
         case UI_ACTION_CALC_LEVEL:
 #ifdef SOFTWARE_LEVELING
-            long factors[4];
+            int32_t factors[4];
             PrintLine::calculatePlane(factors, Printer::levelingP1, Printer::levelingP2, Printer::levelingP3);
             Com::printFLN(Com::tLevelingCalc);
             Com::printFLN(Com::tTower1, PrintLine::calcZOffset(factors, Printer::deltaAPosXSteps, Printer::deltaAPosYSteps) * Printer::invAxisStepsPerMM[2]);
@@ -2816,18 +2901,25 @@ void UIDisplay::executeAction(int action)
         case UI_ACTION_PAUSE:
             Com::printFLN(PSTR("RequestPause:"));
             break;
+#ifdef DEBUG_PRINT
         case UI_ACTION_WRITE_DEBUG:
-            Com::printF(Com::tDebug,(int)GCode::bufferReadIndex);
-            Com::printF(Com::tComma,(int)GCode::bufferWriteIndex);
-            Com::printF(Com::tComma,(int)GCode::commentDetected);
-            Com::printF(Com::tComma,(int)GCode::bufferLength);
-            Com::printF(Com::tComma,(int)GCode::waitingForResend);
-            Com::printFLN(Com::tComma,(int)GCode::commandsReceivingWritePosition);
-            Com::printF(Com::tDebug,Printer::minimumSpeed);
-            Com::printF(Com::tComma,Printer::minimumZSpeed);
-            Com::printF(Com::tComma,(int)PrintLine::linesPos);
-            Com::printFLN(Com::tComma,(int)PrintLine::linesWritePos);
+            Com::printF(PSTR("Buf. Read Idx:"),(int)GCode::bufferReadIndex);
+            Com::printF(PSTR(" Buf. Write Idx:"),(int)GCode::bufferWriteIndex);
+            Com::printF(PSTR(" Comment:"),(int)GCode::commentDetected);
+            Com::printF(PSTR(" Buf. Len:"),(int)GCode::bufferLength);
+            Com::printF(PSTR(" Wait resend:"),(int)GCode::waitingForResend);
+            Com::printFLN(PSTR(" Recv. Write Pos:"),(int)GCode::commandsReceivingWritePosition);
+            Com::printF(PSTR("Min. XY Speed:"),Printer::minimumSpeed);
+            Com::printF(PSTR(" Min. Z Speed:"),Printer::minimumZSpeed);
+            Com::printF(PSTR(" Buffer:"),PrintLine::linesCount);
+            Com::printF(PSTR(" Lines pos:"),(int)PrintLine::linesPos);
+            Com::printFLN(PSTR(" Write Pos:"),(int)PrintLine::linesWritePos);
+            Com::printFLN(PSTR("Wait loop:"),debugWaitLoop);
+            Com::printF(PSTR("sd mode:"),(int)sd.sdmode);
+            Com::printF(PSTR(" pos:"),sd.sdpos);
+            Com::printFLN(PSTR(" of "),sd.filesize);
             break;
+#endif
         }
     refreshPage();
     if(!skipBeep)
@@ -2854,17 +2946,17 @@ void UIDisplay::slowAction()
     {
         flags|=8;
         HAL::allowInterrupts();
-#if FEATURE_CONTROLLER==5
+#if defined(UI_I2C_HOTEND_LED) || defined(UI_I2C_HEATBED_LED) || defined(UI_I2C_FAN_LED)
         {
             // check temps and set appropriate leds
             int led= 0;
-#if NUM_EXTRUDER>0
+#if NUM_EXTRUDER>0 && defined(UI_I2C_HOTEND_LED)
             led |= (tempController[Extruder::current->id]->targetTemperatureC > 0 ? UI_I2C_HOTEND_LED : 0);
 #endif
-#if HAVE_HEATED_BED
+#if HAVE_HEATED_BED && defined(UI_I2C_HEATBED_LED)
             led |= (heatedBedController.targetTemperatureC > 0 ? UI_I2C_HEATBED_LED : 0);
 #endif
-#if FAN_PIN>=0
+#if FAN_PIN>=0 && defined(UI_I2C_FAN_LED)
             led |= (Printer::getFanSpeed() > 0 ? UI_I2C_FAN_LED : 0);
 #endif
             // update the leds
@@ -3001,6 +3093,15 @@ void UIDisplay::fastAction()
     HAL::allowInterrupts();
 #endif
 }
+#if UI_ENCODER_SPEED==0
+const int8_t encoder_table[16] PROGMEM = {0,1,-1,0,-1,0,0,1,1,0,0,-1,0,-1,1,0}; // Full speed
+#elif UI_ENCODER_SPEED==1
+const int8_t encoder_table[16] PROGMEM = {0,0,-1,0,0,0,0,1,1,0,0,0,0,-1,0,0}; // Half speed
+#else
+//const int8_t encoder_table[16] PROGMEM = {0,0,0,0,0,0,0,0,1,0,0,0,0,-1,0,0}; // Quart speed
+//const int8_t encoder_table[16] PROGMEM = {0,1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0}; // Quart speed
+const int8_t encoder_table[16] PROGMEM = {0,0,0,0,0,0,0,0,0,0,0,-1,0,0,1,0}; // Quart speed
+#endif
 
 #endif
 

@@ -53,6 +53,7 @@ To override EEPROM settings with config settings, set EEPROM_MODE 0
 // MEGA/RAMPS up to 1.2       = 3
 // RAMPS 1.3/RAMPS 1.4        = 33
 // Azteeg X3                  = 34
+// Ultimaker Shield 1.5.7     = 37
 // Gen6                       = 5
 // Gen6 deluxe                = 51
 // Sanguinololu up to 1.1     = 6
@@ -72,6 +73,7 @@ To override EEPROM settings with config settings, set EEPROM_MODE 0
 // PiBot for Repetier V1.0-1.3= 314
 // PiBot for Repetier V1.4    = 315
 // Sanguish Beta              = 501
+// Unique One rev. A          = 88
 // User layout defined in userpins.h = 999
 
 #define MOTHERBOARD 33
@@ -404,6 +406,9 @@ Set value to 1: Scale PID by EXT0_PID_MAX/256 and then clip to EXT0_PID_MAX.
 If your EXT0_PID_MAX is low, you should prefer the second method.
 */
 #define SCALE_PID_TO_MAX 0
+
+
+#define HEATER_PWM_SPEED 1 // How fast ist pwm signal 0 = 15.25Hz, 1 = 30.51Hz, 2 = 61.03Hz, 3 = 122.06Hz
 
 /** Temperature range for target temperature to hold in M109 command. 5 means +/-5 degC
 
@@ -744,6 +749,15 @@ on this endstop.
 #define DELTA_RADIUS_CORRECTION_B 0
 #define DELTA_RADIUS_CORRECTION_C 0
 
+/** Correction of the default diagonal size. Value gets added.*/
+#define DELTA_DIAGONAL_CORRECTION_A 0
+#define DELTA_DIAGONAL_CORRECTION_B 0
+#define DELTA_DIAGONAL_CORRECTION_C 0
+
+/** Max. radius the printer should be able to reach. */
+#define DELTA_MAX_RADIUS 200
+
+
 /** \brief Horizontal offset of the universal joints on the end effector (moving platform).
 */
 #define END_EFFECTOR_HORIZONTAL_OFFSET 33
@@ -755,6 +769,9 @@ on this endstop.
 /** \brief Printer radius in mm, measured from the center of the print area to the vertical smooth rod.
 */
 #define PRINTER_RADIUS 220
+
+/** Remove comment for more precise delta moves. Needs a bit more computation time. */
+//#define EXACT_DELTA_MOVES
 
 /**  \brief Horizontal distance bridged by the diagonal push rod when the end effector is in the center. It is pretty close to 50% of the push rod length (250 mm).
 */
@@ -849,7 +866,7 @@ enabling this may cause to stall your moves when 20000Hz is reached.
 for some printers causing an early stall.
 
 */
-#define DOUBLE_STEP_DELAY 1.9 // time in microseconds
+#define DOUBLE_STEP_DELAY 2 // time in microseconds
 
 /** The firmware supports trajectory smoothing. To achieve this, it divides the stepsize by 2, resulting in
 the double computation cost. For slow movements this is not an issue, but for really fast moves this is
@@ -1079,6 +1096,8 @@ is always running and is not hung up for some unknown reason. */
 #define Z_PROBE_ON_HIGH true
 #define Z_PROBE_X_OFFSET 10    // SL, someone needs to measure this on the original KC
 #define Z_PROBE_Y_OFFSET 0
+#define Z_PROBE_BED_DISTANCE 5.0 // Higher than max bed level distance error in mm
+
 // Waits for a signal to start. Valid signals are probe hit and ok button.
 // This is needful if you have the probe trigger by hand.
 #define Z_PROBE_WAIT_BEFORE_TEST false
@@ -1124,8 +1143,14 @@ is always running and is not hung up for some unknown reason. */
 #define Z_PROBE_X3 (-AR*sin(ROT))
 #define Z_PROBE_Y3 (AR*cos(ROT))
 
+/* Babystepping allows to change z height during print without changing official z height */
+#define FEATURE_BABYSTEPPING 0
+/* If you have a threaded rod, you want a higher multiplicator to see an effect. Limit value to 50 or you get easily overflows.*/
+#define BABYSTEP_MULTIPLICATOR 1
+
 /* Define a pin to tuen light on/off */
 #define CASE_LIGHTS_PIN -1
+#define CASE_LIGHT_DEFAULT_ON 1
 
 /** Set to false to disable SD support: */
 #ifndef SDSUPPORT  // Some boards have sd support on board. These define the values already in pins.h
@@ -1177,9 +1202,10 @@ The following settings override uiconfig.h!
 11 = RepRapDiscount Full Graphic Smart Controller
 12 = FELIXPrinters Controller
 13 = SeeMeCNC Display on Rambo (ORION)
-
+14 = OpenHardware.co.za LCD2004 V2014
+15 = Sanguinololu + Panelolu2
 */
-#define FEATURE_CONTROLLER 2
+#define FEATURE_CONTROLLER 0
 
 /**
 Select the language to use.
@@ -1243,7 +1269,7 @@ same setting.
 /**
 Beeper sound definitions for short beeps during key actions
 and longer beeps for important actions.
-Parameter is delay in microseconds and the secons is the number of repetitions.
+Parameter is delay in microseconds and the second is the number of repetitions.
 Values must be in range 1..255
 */
 #define BEEPER_SHORT_SEQUENCE 2,2
